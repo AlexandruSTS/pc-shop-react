@@ -16,8 +16,7 @@ export function getList() {
             if (typeof data === 'string') {
                 // Handle HTML response as a string
                 console.log('HTML response:', data);
-                return []; // Return an empty array or handle it as per your requirements
-            } else {
+                return []; // Return an empty array or handle it
                 // Handle JSON response
                 return data; // Return the JSON data as-is
             }
@@ -28,7 +27,7 @@ const Catalog = () => {
     const [items, setItems] = useState<Item[]>([]);
 
     useEffect(() => {
-        getList() // Use the modified getList function
+        getList()
             .then(data => setItems(data))
             .catch(error => console.error(error));
     }, []);
