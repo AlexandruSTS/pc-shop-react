@@ -1,16 +1,11 @@
 import { useState } from 'react';
-import Register from "./components/Register";
-import Login from "./components/Login";
+import Catalog from './components/Catalog';
 
 export default function App() {
-    const [showRegister, setShowRegister] = useState(false);
+    const [showCatalog, setShowCatalog] = useState(false);
 
-    const handleToggleRegister = () => {
-        setShowRegister(true);
-    };
-
-    const handleToggleLogin = () => {
-        setShowRegister(false);
+    const handleOpenCatalog = () => {
+        setShowCatalog(true);
     };
 
     return (
@@ -18,10 +13,9 @@ export default function App() {
             <div className="wrapper">
                 <h1>App</h1>
                 <div>
-                    <button onClick={handleToggleRegister}>Register</button>
-                    <button onClick={handleToggleLogin}>Login</button>
+                    <button onClick={handleOpenCatalog}>Open Catalog</button>
                 </div>
-                {showRegister ? <Register /> : <Login />}
+                {showCatalog && <Catalog />}
             </div>
         </>
     );
