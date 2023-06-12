@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Catalog from './components/Catalog';
+import ItemsList from "./components/items.component.tsx";
 
 export default function App() {
     const [showCatalog, setShowCatalog] = useState(false);
@@ -17,6 +18,8 @@ export default function App() {
                 </div>
                 {showCatalog && <Catalog />}
             </div>
+
+            <ItemsList/>
         </>
     );
 }

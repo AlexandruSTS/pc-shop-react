@@ -6,7 +6,7 @@ export function getList() {
         .then((response) => {
             const contentType = response.headers.get('Content-Type');
 
-            if (contentType && contentType.includes('text/html')) {
+            if (contentType && contentType.includes('application/json')) {
                 return response.text(); // Get the HTML content as a string
             } else {
                 return response.json(); // Parse JSON if the response is in application/json format
