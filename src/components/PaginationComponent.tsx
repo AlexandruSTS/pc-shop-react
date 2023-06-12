@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Item } from '../types/Item.tsx';
+import './css/PaginationComponent.css'; // Import the CSS file for component styling
 
 const PaginationComponent = () => {
     const [items, setItems] = useState([]);
@@ -16,8 +17,8 @@ const PaginationComponent = () => {
                     params: {
                         page: currentPage,
                         size: pageSize,
-                        sort: sortOption
-                    }
+                        sort: sortOption,
+                    },
                 });
                 const { content, totalPages } = response.data;
                 setItems(content);
@@ -34,7 +35,7 @@ const PaginationComponent = () => {
         setCurrentPage(pageNumber);
     };
 
-    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleSortChange = (e: any) => {
         setSortOption(e.target.value);
     };
 
@@ -42,7 +43,11 @@ const PaginationComponent = () => {
         const buttons = [];
         for (let i = 0; i < totalPages; i++) {
             buttons.push(
-                <button key={i} onClick={() => handlePageClick(i)} disabled={currentPage === i}>
+                <button
+                    key={i}
+                    onClick={() => handlePageClick(i)}
+                    disabled={currentPage === i}
+                >
                     {i + 1}
                 </button>
             );
@@ -58,7 +63,11 @@ const PaginationComponent = () => {
         <div>
             <div>
                 <label htmlFor="pageSize">Results per page:</label>
-                <select id="pageSize" value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
+                <select
+                    id="pageSize"
+                    value={pageSize}
+                    onChange={(e) => setPageSize(Number(e.target.value))}
+                >
                     <option value={3}>3</option>
                     <option value={6}>6</option>
                     <option value={9}>9</option>
@@ -73,7 +82,7 @@ const PaginationComponent = () => {
                     <option value="price,desc">Price (Descending)</option>
                 </select>
             </div>
-            <table>
+            <table className="item-table">
                 <thead>
                 <tr>
                     <th>No°</th>
@@ -85,9 +94,9 @@ const PaginationComponent = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {items.map((item: Item, index: number) => (
+                {items.map((item: Item, index) => (
                     <tr key={item.id}>
-                        <td>{calculateItemNumber(index)}</td> {/* Display the calculated item number */}
+                        <td>{calculateItemNumber(index)}</td>
                         <td>{item.id}</td>
                         <td>{item.name}</td>
                         <td>{item.description}</td>
