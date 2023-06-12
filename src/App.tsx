@@ -1,25 +1,13 @@
-import { useState } from 'react';
-import Catalog from './components/Catalog';
-import ItemsList from "./components/items.component.tsx";
+import PaginationComponent from "./components/PaginationComponent.tsx";
 
-export default function App() {
-    const [showCatalog, setShowCatalog] = useState(false);
-
-    const handleOpenCatalog = () => {
-        setShowCatalog(true);
-    };
+function App() {
 
     return (
-        <>
-            <div className="wrapper">
-                <h1>App</h1>
-                <div>
-                    <button onClick={handleOpenCatalog}>Open Catalog</button>
-                </div>
-                {showCatalog && <Catalog />}
-            </div>
-
-            <ItemsList/>
-        </>
+        <div className='container mt-5'>
+            <h2>Simple Pagination Example in React</h2>
+            <PaginationComponent/>
+        </div>
     );
 }
+
+export default App;

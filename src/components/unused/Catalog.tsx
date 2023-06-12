@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Item } from '../types/Item';
+import { Item } from '../../types/Item.tsx';
 
 export function getList() {
     return fetch('/pc-shop/items/all-items')

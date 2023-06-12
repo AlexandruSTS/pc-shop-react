@@ -1,7 +1,7 @@
 import React, {Component, ChangeEvent} from "react";
-import ItemsDataService from "../services/itemsService";
+import ItemsDataService from "./services/itemsService.tsx";
 import Pagination from "@material-ui/lab/Pagination";
-import {Item} from "../types/Item.tsx";
+import {Item} from "../../types/Item.tsx";
 
 interface State {
     items: Item[];
