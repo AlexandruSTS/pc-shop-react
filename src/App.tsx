@@ -1,25 +1,25 @@
-import { useState } from 'react';
-import Catalog from './components/Catalog';
-import ItemsList from "./components/items.component.tsx";
+import PaginationComponent from "./components/PaginationComponent.tsx";
+import LoginButton from "./LogginButton.tsx";
+import LogoutButton from "./LogoutButton.tsx";
+import {useAuth0} from "@auth0/auth0-react";
 
-export default function App() {
-    const [showCatalog, setShowCatalog] = useState(false);
+function App() {
+    const {user, isAuthenticated, isLoading} = useAuth0();
 
-    const handleOpenCatalog = () => {
-        setShowCatalog(true);
-    };
+    // if (isLoading) {
+    //     return <div>En chargement...</div>
+    // }
 
     return (
-        <>
-            <div className="wrapper">
-                <h1>App</h1>
+        <div className='container mt-5'>
+            <h2>Items</h2>
+            {isAuthenticated ?
                 <div>
-                    <button onClick={handleOpenCatalog}>Open Catalog</button>
-                </div>
-                {showCatalog && <Catalog />}
-            </div>
-
-            <ItemsList/>
-        </>
+                    <p> Bonjour {user?.name} <LogoutButton/> </p>
+                    <PaginationComponent/>
+                </div> : <LoginButton/>}
+        </div>
     );
 }
+
+export default App;
