@@ -1,7 +1,6 @@
-import  { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import { Item } from '../types/Item.tsx';
-import './css/PaginationComponent.css'; // Import the CSS file for component styling
+import './css/PaginationComponent.css';
 
 const PaginationComponent = () => {
     const [items, setItems] = useState([]);
@@ -13,14 +12,14 @@ const PaginationComponent = () => {
     useEffect(() => {
         const fetchItems = async () => {
             try {
-                const response = await axios.get('/pc-shop/items/all-items', {
-                    params: {
-                        page: currentPage,
-                        size: pageSize,
-                        sort: sortOption,
-                    },
+                const queryParams = new URLSearchParams({
+                    page: String(currentPage), // Convert to string
+                    size: String(pageSize), // Convert to string
+                    sort: sortOption,
                 });
-                const { content, totalPages } = response.data;
+
+                const response = await fetch(`/pc-shop/items/all-items?${queryParams}`);
+                const { content, totalPages } = await response.json();
                 setItems(content);
                 setTotalPages(totalPages);
             } catch (error) {
@@ -106,9 +105,7 @@ const PaginationComponent = () => {
                 ))}
                 </tbody>
             </table>
-            <div>
-                {renderPageButtons()}
-            </div>
+            <div>{renderPageButtons()}</div>
         </div>
     );
 };
