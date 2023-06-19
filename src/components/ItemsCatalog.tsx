@@ -1,32 +1,44 @@
-import { useState, useEffect } from 'react';
-import { Item } from '../types/Item.tsx';
+import {useState, useEffect} from 'react';
+import {Item} from '../types/Item.tsx';
 import './css/PaginationComponent.css';
+import {useAuth0} from "@auth0/auth0-react";
 
-const PaginationComponent = () => {
+
+const ItemsCatalog = () => {
     const [items, setItems] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [pageSize, setPageSize] = useState(6);
     const [sortOption, setSortOption] = useState('name,asc');
+    const {getAccessTokenSilently} = useAuth0();
 
     useEffect(() => {
         const fetchItems = async () => {
             try {
+                const accessToken = await getAccessTokenSilently();
                 const queryParams = new URLSearchParams({
-                    page: String(currentPage), // Convert to string
-                    size: String(pageSize), // Convert to string
+                    page: String(currentPage),
+                    size: String(pageSize),
                     sort: sortOption,
                 });
 
-                const response = await fetch(`/pc-shop/items/all-items?${queryParams}`);
-                const { content, totalPages } = await response.json();
+                const response = await fetch(
+                    `/pc-shop/items/all-items?${queryParams}`,
+                    {
+                        headers: {
+                            Accept: 'application/json',
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                    }
+                );
+
+                const {content, totalPages} = await response.json();
                 setItems(content);
                 setTotalPages(totalPages);
             } catch (error) {
                 console.error('Error fetching items:', error);
             }
         };
-
         fetchItems();
     }, [currentPage, pageSize, sortOption]);
 
@@ -110,4 +122,4 @@ const PaginationComponent = () => {
     );
 };
 
-export default PaginationComponent;
+export default ItemsCatalog;

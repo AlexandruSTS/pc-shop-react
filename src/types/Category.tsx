@@ -1,6 +1,5 @@
-
-export type Category = {
-    id: number;
+interface Category {
+    id: number | undefined;
     name: string;
     description: string;
-};
+}
