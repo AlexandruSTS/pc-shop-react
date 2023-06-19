@@ -33,5 +33,6 @@ export default function PermissionGuard({ permissions, children }: PermissionGua
         checkPermission();
     }, [isAuthenticated, getAccessTokenSilently, permissions]);
 
+    // console.log("children: " + children)
     return <>{hasPermission ? <>{children}</> : null}</>;
 }

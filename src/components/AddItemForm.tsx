@@ -2,6 +2,11 @@ import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import Select from 'react-select';
 
+export interface ItemsControllerProps {
+    itemList: Item[];
+    addItemToList: (item: Item) => void;
+}
+
 const AddItemForm = () => {
     const { getAccessTokenSilently } = useAuth0();
     const [categories, setCategories] = useState<Category[]>([]);
@@ -10,7 +15,7 @@ const AddItemForm = () => {
         name: '',
         description: '',
         price: undefined,
-        categories: []
+        categories: [],
     });
 
     const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
@@ -47,7 +52,9 @@ const AddItemForm = () => {
 
     const handleCategoryChange = (selectedOptions: any) => {
         const selectedCategoryIds = selectedOptions.map((option: any) => option.value);
-        const selectedCategories = categories.filter(category => selectedCategoryIds.includes(category.id));
+        const selectedCategories = categories.filter((category) =>
+            selectedCategoryIds.includes(category.id)
+        );
         setSelectedCategories(selectedCategories);
     };
 
@@ -72,12 +79,9 @@ const AddItemForm = () => {
             });
 
             if (response.ok) {
-                // Item created successfully
+                // const newItem = await response.json();
                 setErrorMessage('Item added successfully');
-
-                // Perform any necessary actions, such as refreshing the item list
             } else {
-                // Handle the error case
                 const errorMessage = await response.text();
                 setErrorMessage(errorMessage);
             }
@@ -86,7 +90,7 @@ const AddItemForm = () => {
         }
     };
 
-    const categoryOptions = categories.map(category => ({
+    const categoryOptions = categories.map((category) => ({
         value: category.id,
         label: category.name,
     }));
@@ -134,7 +138,7 @@ const AddItemForm = () => {
                         name="category"
                         isMulti
                         options={categoryOptions}
-                        value={selectedCategories.map(category => ({
+                        value={selectedCategories.map((category) => ({
                             value: category.id,
                             label: category.name,
                         }))}

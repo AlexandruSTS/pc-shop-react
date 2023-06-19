@@ -1,123 +1,134 @@
-import {useState, useEffect} from 'react';
-import {Item} from '../types/Item.tsx';
-import './css/PaginationComponent.css';
-import {useAuth0} from "@auth0/auth0-react";
+import React, { useState } from 'react';
+import Table from 'react-bootstrap/Table';
+import { useAuth0 } from '@auth0/auth0-react';
+import useFetchItemsEffect from './FetchItemsEffect';
 
+const ItemsCatalog: React.FC = () => {
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [pageSize, setPageSize] = useState<number>(5);
+    const [sortOption, setSortOption] = useState<string>('price,desc');
+    const [items, setItems] = useState<Item[]>([]);
+    const [totalPages, setTotalPages] = useState<number>(0);
+    const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-const ItemsCatalog = () => {
-    const [items, setItems] = useState([]);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
-    const [pageSize, setPageSize] = useState(6);
-    const [sortOption, setSortOption] = useState('name,asc');
-    const {getAccessTokenSilently} = useAuth0();
-
-    useEffect(() => {
-        const fetchItems = async () => {
-            try {
-                const accessToken = await getAccessTokenSilently();
-                const queryParams = new URLSearchParams({
-                    page: String(currentPage),
-                    size: String(pageSize),
-                    sort: sortOption,
-                });
-
-                const response = await fetch(
-                    `/pc-shop/items/all-items?${queryParams}`,
-                    {
-                        headers: {
-                            Accept: 'application/json',
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                    }
-                );
-
-                const {content, totalPages} = await response.json();
-                setItems(content);
-                setTotalPages(totalPages);
-            } catch (error) {
-                console.error('Error fetching items:', error);
-            }
-        };
-        fetchItems();
-    }, [currentPage, pageSize, sortOption]);
+    useFetchItemsEffect({
+        isAuthenticated,
+        currentPage,
+        pageSize,
+        sortOption,
+        getAccessTokenSilently,
+        setItems,
+        setTotalPages,
+    });
 
     const handlePageClick = (pageNumber: number) => {
         setCurrentPage(pageNumber);
     };
 
-    const handleSortChange = (e: any) => {
+    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSortOption(e.target.value);
     };
 
-    const renderPageButtons = () => {
-        const buttons = [];
-        for (let i = 0; i < totalPages; i++) {
-            buttons.push(
-                <button
-                    key={i}
-                    onClick={() => handlePageClick(i)}
-                    disabled={currentPage === i}
-                >
-                    {i + 1}
-                </button>
-            );
-        }
-        return buttons;
+    const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newPageSize = Number(e.target.value);
+        setPageSize(newPageSize);
+        setCurrentPage(Math.floor((currentPage * pageSize) / newPageSize));
     };
 
-    const calculateItemNumber = (index: number) => {
-        return currentPage * pageSize + index + 1;
+    const generatePageNumbers = () => {
+        const pageNumbers: (number | string)[] = [];
+        const totalPagesToShow = Math.min(10, totalPages); // Show up to 10 pages
+
+        if (totalPagesToShow <= 9) {
+            for (let i = 0; i < totalPagesToShow; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            const startPage = Math.max(0, currentPage - 4);
+            const endPage = Math.min(startPage + 9, totalPages - 1);
+
+            if (endPage === totalPages - 1) {
+                for (let i = endPage - 9; i <= endPage; i++) {
+                    pageNumbers.push(i);
+                }
+            } else {
+                for (let i = startPage; i < startPage + 8; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages - 1);
+            }
+        }
+
+        return pageNumbers;
     };
 
     return (
-        <div>
-            <div>
-                <label htmlFor="pageSize">Results per page:</label>
-                <select
-                    id="pageSize"
-                    value={pageSize}
-                    onChange={(e) => setPageSize(Number(e.target.value))}
-                >
-                    <option value={3}>3</option>
-                    <option value={6}>6</option>
-                    <option value={9}>9</option>
-                </select>
+        <div className="container">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2>Items Catalog</h2>
+                <div>
+                    <label htmlFor="sortOption">Sort By:</label>
+                    <select id="sortOption" value={sortOption} onChange={handleSortChange}>
+                        <option value="name,asc">Name (Ascending)</option>
+                        <option value="name,desc">Name (Descending)</option>
+                        <option value="price,asc">Price (Ascending)</option>
+                        <option value="price,desc">Price (Descending)</option>
+                    </select>
+                </div>
+                <div>
+                    <label htmlFor="pageSize">Items Per Page:</label>
+                    <select id="pageSize" value={pageSize} onChange={handlePageSizeChange}>
+                        <option value="3">3</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
             </div>
-            <div>
-                <label htmlFor="sortOption">Sort by:</label>
-                <select id="sortOption" value={sortOption} onChange={handleSortChange}>
-                    <option value="name,asc">Name (Ascending)</option>
-                    <option value="name,desc">Name (Descending)</option>
-                    <option value="price,asc">Price (Ascending)</option>
-                    <option value="price,desc">Price (Descending)</option>
-                </select>
-            </div>
-            <table className="item-table">
+            <Table striped bordered hover>
                 <thead>
                 <tr>
-                    <th>No°</th>
-                    <th>ID</th>
                     <th>Name</th>
-                    <th>Description</th>
                     <th>Price</th>
+                    <th>Description</th>
                     <th>Categories</th>
                 </tr>
                 </thead>
                 <tbody>
-                {items.map((item: Item, index) => (
+                {items.map((item) => (
                     <tr key={item.id}>
-                        <td>{calculateItemNumber(index)}</td>
-                        <td>{item.id}</td>
                         <td>{item.name}</td>
-                        <td>{item.description}</td>
                         <td>{item.price}</td>
-                        <td>{item.categories.map((category) => category.name).join(', ')}</td>
+                        <td>{item.description}</td>
+                        <td>
+                            {item.categories.map((category) => (
+                                category.name + ' '
+                            ))}
+                        </td>
                     </tr>
                 ))}
                 </tbody>
-            </table>
-            <div>{renderPageButtons()}</div>
+            </Table>
+            <div className="d-flex justify-content-center">
+                {generatePageNumbers().map((pageNumber, index) =>
+                        pageNumber === '...' ? (
+                            <span key={index} className="mx-1">
+              {pageNumber}
+            </span>
+                        ) : (
+                            <button
+                                key={index}
+                                onClick={() => handlePageClick(pageNumber as number)}
+                                className={`btn btn-primary mx-1 ${
+                                    pageNumber === currentPage ? 'active' : ''
+                                }`}
+                                style={{ width: '40px' }} // Fixed size of buttons
+                            >
+                                {pageNumber as number + 1}
+                            </button>
+                        )
+                )}
+            </div>
         </div>
     );
 };

@@ -6,13 +6,13 @@ import {Auth0Provider} from "@auth0/auth0-react";
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <Auth0Provider
-        domain="eafc-projint-anghel.eu.auth0.com"
-        clientId="qJ2haGAjsir4Uj3z7Bf3dLAO0YZUe3E7"
+        domain={import.meta.env.VITE_AUTH0_DOMAIN}
+        clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
         useRefreshTokens={true}
         authorizationParams={{
             redirect_uri: window.location.origin,
             audience: "https://pc-shop/api",
-            scope: 'profile email write:item read:all-items write:category'
+            scope: 'openid profile email write:item read:all-items write:category'
         }}
     >
         <React.StrictMode>
