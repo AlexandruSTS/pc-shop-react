@@ -1,14 +1,12 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import LoginButton from "./components/LoginButton.tsx";
 import LogoutButton from "./components/LogoutButton.tsx";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import ItemsCatalog from "./components/ItemsCatalog.tsx";
 import PermissionGuard from "./service/PermissionGuard.tsx";
 import AddItemForm from "./components/AddItemForm.tsx";
 
 const App = () => {
     const { isAuthenticated, user } = useAuth0();
-
     return (
         <div className="container-fluid">
             <div className="d-flex justify-content-between align-items-center">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Table from 'react-bootstrap/Table';
 import { useAuth0 } from '@auth0/auth0-react';
 import useFetchItemsEffect from './FetchItemsEffect';
+import {Table} from "react-bootstrap";
 
 const ItemsCatalog: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<number>(0);
