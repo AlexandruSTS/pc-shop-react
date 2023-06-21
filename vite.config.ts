@@ -1,40 +1,47 @@
-import {defineConfig, loadEnv} from "vite";
-import react from "@vitejs/plugin-react-swc";
+import { defineConfig } from 'vite';
+import reactRefresh from '@vitejs/plugin-react-refresh';
+import copy from 'rollup-plugin-copy';
 
-export default defineConfig(({mode}) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const env = loadEnv(mode, process.cwd());
+export default defineConfig(({ mode }) => {
 
+    const PROD = mode === 'production';
+    let base_url = 'http://localhost:8090';
+    if (PROD) {
+        base_url = 'http://pc-shop-alex.us-east-1.elasticbeanstalk.com';
+    }
     return {
-        plugins: [react()],
+        base: '',
+        plugins: [
+            reactRefresh(),
+            copy({
+                targets: [
+                    {
+                        src: ['public/**/*'],
+                        dest: 'dist',
+                        ignore: ['index.html', 'assets/**/*'],
+                    },
+                ],
+            }),
+        ],
         server: {
             proxy: {
                 '/pc-shop': {
-                    target: env.VITE_API_URL,
+                    target: base_url,
                     changeOrigin: true,
-                    secure: false
-                }
-            }
+                    secure: false,
+                },
+            },
         },
-        // esbuild: {
-        //     jsxFactory: 'React.createElement',
-        //     jsxFragment: 'React.Fragment',
-        // },
-        // css: {
-        //     modules: {
-        //         localsConvention: 'camelCaseOnly',
-        //     },
-        // },
         build: {
-            target: 'modules',
-            // generate manifest.json in outDir
             manifest: true,
             rollupOptions: {
-                // overwrite default .html entry
-                input: 'index.html',
+                output: {
+                    entryFileNames: PROD ? '[name]-[hash].js' : undefined,
+                    chunkFileNames: PROD ? '[name]-[hash].js' : undefined,
+                    assetFileNames: PROD ? '[name]-[hash][extname]' : undefined,
+                },
             },
-            outDir: 'dist' // Specify the output directory for the build
-        }
+            publicDir: './',
+        },
     };
 });

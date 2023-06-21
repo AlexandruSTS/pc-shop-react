@@ -1,53 +1,47 @@
-import { useEffect } from 'react';
+import React, {useEffect} from 'react';
 
 interface FetchItemsEffectProps {
-    isAuthenticated: boolean;
+    // isAuthenticated: boolean;
     currentPage: number;
     pageSize: number;
     sortOption: string;
-    getAccessTokenSilently: () => Promise<string>;
+    // getAccessTokenSilently: () => Promise<string>;
     setItems: React.Dispatch<React.SetStateAction<Item[]>>;
     setTotalPages: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const useFetchItemsEffect = ({
-                                 isAuthenticated,
+                                 // isAuthenticated,
                                  currentPage,
                                  pageSize,
                                  sortOption,
-                                 getAccessTokenSilently,
+                                 // getAccessTokenSilently,
                                  setItems,
                                  setTotalPages,
                              }: FetchItemsEffectProps) => {
     useEffect(() => {
-        if (isAuthenticated) {
-            const fetchItems = async () => {
-                const queryParams = new URLSearchParams({
-                    page: String(currentPage),
-                    size: String(pageSize),
-                    sort: sortOption,
-                });
+        // if (isAuthenticated) {
+        const fetchItems = async () => {
+            const queryParams = new URLSearchParams({
+                page: String(currentPage),
+                size: String(pageSize),
+                sort: sortOption,
+            });
 
-                try {
-                    const accessToken = await getAccessTokenSilently();
+            try {
+                // const accessToken = await getAccessTokenSilently();
+                const response = await fetch( '/pc-shop/items/all-items?' + queryParams);
+                const {content, totalPages} = await response.json();
+                setItems(content);
+                setTotalPages(totalPages);
+            } catch (error) {
+                console.error('Error fetching items:', error);
+            }
+        };
 
-                    const response = await fetch(`/pc-shop/items/all-items?${queryParams}`, {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                    });
-
-                    const { content, totalPages } = await response.json();
-                    setItems(content);
-                    setTotalPages(totalPages);
-                } catch (error) {
-                    console.error('Error fetching items:', error);
-                }
-            };
-
-            fetchItems();
-        }
-    }, [currentPage, pageSize, sortOption, isAuthenticated, getAccessTokenSilently, setItems, setTotalPages]);
+        fetchItems()
+        // }
+    }, [currentPage, pageSize, sortOption, setItems, setTotalPages]);
 };
 
 export default useFetchItemsEffect;

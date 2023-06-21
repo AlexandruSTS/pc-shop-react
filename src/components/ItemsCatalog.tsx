@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+// import { useAuth0 } from '@auth0/auth0-react';
 import useFetchItemsEffect from './FetchItemsEffect';
 import {Table} from "react-bootstrap";
 
 const ItemsCatalog: React.FC = () => {
-    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(5);
     const [sortOption, setSortOption] = useState<string>('price,desc');
     const [items, setItems] = useState<Item[]>([]);
     const [totalPages, setTotalPages] = useState<number>(0);
-    const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+    // const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
     useFetchItemsEffect({
-        isAuthenticated,
+        // isAuthenticated,
         currentPage,
         pageSize,
         sortOption,
-        getAccessTokenSilently,
+        // getAccessTokenSilently,
         setItems,
         setTotalPages,
     });
