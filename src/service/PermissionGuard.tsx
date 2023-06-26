@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 
 type PermissionGuardProps = {
@@ -19,6 +19,7 @@ export default function PermissionGuard({ permissions, children }: PermissionGua
 
             try {
                 const token = await getAccessTokenSilently();
+                // console.log(token)
                 const decodedToken = JSON.parse(atob(token.split('.')[1])) as { permissions: string[] };
                 const userPermissions = decodedToken.permissions || [];
                 const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
@@ -36,3 +37,35 @@ export default function PermissionGuard({ permissions, children }: PermissionGua
     // console.log("children: " + children)
     return <>{hasPermission ? <>{children}</> : null}</>;
 }
+
+//
+// export default function PermissionGuard({permissions, children} : PermissionGuardProps){
+//     const {getAccessTokenSilently} = useAuth0();
+//
+//     const fetcher = async (url: any) =>{
+//         const accessToken = await getAccessTokenSilently();
+//         console.log(accessToken)
+//
+//         return fetch(url, {
+//             headers: {
+//                 Accept: "application/json",
+//                 Authorization: `Bearer ${accessToken}`,
+//             }
+//         }).then((r)=> r.json())
+//     };
+//
+//
+//     const {data, isLoading, error} = useSWR("/pc-shop/items/permissions", fetcher)
+//
+//     if (isLoading) return <p>Loading...</p>
+//
+//     if(error) return <p>Error</p>
+//
+//     if(data.includes(permissions)){
+//         return children;
+//     }
+//     else
+//     {
+//         return null;
+//     }
+// }

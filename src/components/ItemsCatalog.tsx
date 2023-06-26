@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, ChangeEvent } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import useFetchItemsEffect from './FetchItemsEffect';
-import {Table} from "react-bootstrap";
+import { Table } from 'react-bootstrap';
+
 
 const ItemsCatalog: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<number>(0);
@@ -9,35 +9,77 @@ const ItemsCatalog: React.FC = () => {
     const [sortOption, setSortOption] = useState<string>('price,desc');
     const [items, setItems] = useState<Item[]>([]);
     const [totalPages, setTotalPages] = useState<number>(0);
-    const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+    const [eTag, setETag] = useState<string | null>(null);
+    const {getAccessTokenSilently, isAuthenticated } = useAuth0();
 
-    useFetchItemsEffect({
-        isAuthenticated,
-        currentPage,
-        pageSize,
-        sortOption,
-        getAccessTokenSilently,
-        setItems,
-        setTotalPages,
-    });
+    const fetchItems = async () => {
+        if (isAuthenticated) {
+            const queryParams = new URLSearchParams({
+                page: String(currentPage),
+                size: String(pageSize),
+                sort: sortOption,
+            });
+
+            try {
+                const accessToken = await getAccessTokenSilently();
+                const headers: HeadersInit = {
+                    Authorization: `Bearer ${accessToken}`,
+                };
+
+                // Include the If-None-Match header if ETag exists
+                if (eTag) {
+                    headers['If-None-Match'] = eTag;
+                }
+
+                const response = await fetch(`/pc-shop/items/all-items?${queryParams}`, {
+                    headers,
+                });
+
+                // Not modified, return from cache
+                if (response.status === 304) {
+                    return;
+                }
+
+                if (response.ok) {
+                    const { content, totalPages } = await response.json();
+                    setItems(content);
+                    setTotalPages(totalPages);
+
+                    // Get the new ETag value from the response headers
+                    setETag(response.headers.get('ETag'));
+                } else {
+                    console.error('Error fetching items:', response.status);
+                }
+            } catch (error) {
+                console.error('Error fetching items:', error);
+            }
+        }
+    };
+
+
+    useEffect(() => {
+        fetchItems();
+    }, [currentPage, pageSize, sortOption, isAuthenticated, getAccessTokenSilently, eTag]);
 
     const handlePageClick = (pageNumber: number) => {
+        // setETag(null);
         setCurrentPage(pageNumber);
     };
 
-    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleSortChange = (e: ChangeEvent<HTMLSelectElement>) => {
         setSortOption(e.target.value);
     };
 
-    const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const newPageSize = Number(e.target.value);
         setPageSize(newPageSize);
         setCurrentPage(Math.floor((currentPage * pageSize) / newPageSize));
     };
 
-    const generatePageNumbers = () => {
+    const generatePageNumbers = (): (number | string)[] => {
         const pageNumbers: (number | string)[] = [];
-        const totalPagesToShow = Math.min(10, totalPages); // Show up to 10 pages
+        // Show up to 10 pages
+        const totalPagesToShow = Math.min(10, totalPages);
 
         if (totalPagesToShow <= 9) {
             for (let i = 0; i < totalPagesToShow; i++) {
@@ -101,7 +143,7 @@ const ItemsCatalog: React.FC = () => {
                         <td>{item.price}</td>
                         <td>{item.description}</td>
                         <td>
-                            {item.categories.map((category) => (
+                            {item.categories.map((category: Category) => (
                                 category.name + ' '
                             ))}
                         </td>

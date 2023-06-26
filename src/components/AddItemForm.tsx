@@ -26,7 +26,7 @@ const AddItemForm = () => {
             try {
                 const accessToken = await getAccessTokenSilently();
 
-                const response = await fetch('/categories/all-categories', {
+                const response = await fetch('/pc-shop/categories/all-categories', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
